@@ -497,10 +497,18 @@ namespace AVRSim
                 // 0011 KKKK dddd KKKK
                 else if ((currentInstruction & 0xF000) == 0x3000)
                 {
+                    byte rd_val = GPR[((currentInstruction >> 4) & 0xF) + 0x10];
+                    byte kk = (byte)(((currentInstruction >> 4) & 0xF0) | (currentInstruction & 0xF));
+                    byte result = (byte)(rd_val - kk);
+                    SREG_C = kk > rd_val;
+                    SREG_Z = result == 0;
+                    SREG_N = ((result & 0x80) >> 7) != 0;
+                    SREG_V = (((rd_val & 0x80) >> 7) & ~((kk & 0x80) >> 7) & ~((result & 0x80) >> 7) | ~((rd_val & 0x80) >> 7) & ((kk & 0x80) >> 7) & ((result & 0x80) >> 7)) != 0;
+                    SREG_S = SREG_N ^ SREG_V;
+                    SREG_H = (~((rd_val & 0x8) >> 3) & ((kk & 0x8) >> 3) | ((kk & 0x8) >> 3) & ((result & 0x8) >> 3) | ((result & 0x8) >> 3) & ~((rd_val & 0x8) >> 3)) != 0;
                     PC++;
                     words++;
                     cycles++;
-                    isHalted = true;
                 }
 
                 // CPSE

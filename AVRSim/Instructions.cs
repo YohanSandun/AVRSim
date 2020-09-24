@@ -36,15 +36,15 @@ namespace AVRSim
 
         private static string GetHex(int num)
         {
-            return "0x" + Convert.ToString(num, 16).ToUpper();
+            return "$" + Convert.ToString(num, 16).ToUpper();
         }
 
         private static string GetHexByte(int num)
         {
             if (num > 15)
-                return "0x" + Convert.ToString(num, 16).ToUpper();
+                return "$" + Convert.ToString(num, 16).ToUpper();
             else
-                return "0x0" + Convert.ToString(num, 16).ToUpper();
+                return "$0" + Convert.ToString(num, 16).ToUpper();
         }
 
         public static string GetInstructionString(int currentInstruction, int nextInstruction)
@@ -369,7 +369,7 @@ namespace AVRSim
             // 0011 KKKK dddd KKKK
             else if ((currentInstruction & 0xF000) == 0x3000)
             {
-                return "CPI";
+                return "CPI " + GetRegisterName(((currentInstruction >> 4) & 0xF) + 0x10) + ", " + GetHexByte(((currentInstruction >> 4) & 0xF0) | (currentInstruction & 0xF));
             }
 
             // CPSE
