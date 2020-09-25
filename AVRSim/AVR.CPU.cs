@@ -18,6 +18,8 @@
 //  along with AVRSim.  If not, see <https://www.gnu.org/licenses/>.
 //
 //---------------------------------------------------------------------------
+using System.Diagnostics;
+
 namespace AVRSim
 {
     partial class AVR
@@ -27,19 +29,13 @@ namespace AVRSim
         public int PC = 0;
         public int words = 0, cycles = 0;
         public bool isHalted = false;
-
-        public void Run()
-        {
-            while (!isHalted)
-            {
-                Step();
-            }
-        }
+        public long instructionCounter = 0;
 
         public void Step()
         {
             if (!isHalted)
             {
+                instructionCounter++;
                 currentInstruction = FLASH[PC];
 
                 // ADC
@@ -56,20 +52,37 @@ namespace AVRSim
                 // 0000 11rd dddd rrrr
                 else if ((currentInstruction & 0xFC00) == 0x0C00)
                 {
+                    int rd = (currentInstruction >> 4) & 0x1F;
+                    int rr = ((currentInstruction >> 5) & 0x10) | (currentInstruction & 0xF);
+                    byte result = (byte)(GPR[rd] + GPR[rr]);
+                    SREG_C = (((GPR[rd] & 0x80) >> 7) & ((GPR[rr] & 0x80) >> 7) | ((GPR[rr] & 0x80) >> 7) & ~((result & 0x80) >> 7) | ~((result & 0x80) >> 7) & ((GPR[rd] & 0x80) >> 7)) != 0;
+                    SREG_Z = result == 0;
+                    SREG_N = ((result & 0x80) >> 7) != 0;
+                    SREG_V = (((GPR[rd] & 0x80) >> 7) & ((GPR[rr] & 0x80) >> 7) & ~((result & 0x80) >> 7) | ~((GPR[rd] & 0x80) >> 7) & ~((GPR[rr] & 0x80) >> 7) & ((result & 0x80) >> 7)) != 0;
+                    SREG_S = SREG_N ^ SREG_V;
+                    SREG_H = (((GPR[rd] & 0x8) >> 3) & ((GPR[rr] & 0x8) >> 3) | ((GPR[rr] & 0x8) >> 3) & ~((result & 0x8) >> 3) | ~((result & 0x8) >> 3) & ((GPR[rd] & 0x8) >> 3)) != 0;
+                    GPR[rd] = result;
                     PC++;
                     words++;
                     cycles++;
-                    isHalted = true;
                 }
 
                 // ADIW
                 // 1001 0110 KKdd KKKK
                 else if ((currentInstruction & 0xFF00) == 0x9600)
                 {
+                    int rd = (((currentInstruction >> 4) & 0x3) * 2) + 24;
+                    ushort result = (ushort)(((GPR[rd + 1] << 8) | GPR[rd]) + (((currentInstruction >> 2) & 0x30) | (currentInstruction & 0xF)));
+                    SREG_C = (~((result & 0x8000) >> 15) & ((GPR[rd + 1] & 0x80) >> 7)) == 1;
+                    SREG_Z = result == 0;
+                    SREG_N = ((result & 0x8000) >> 15) != 0;
+                    SREG_V = (((result & 0x8000) >> 15) & ~((GPR[rd + 1] & 0x80) >> 7)) == 1;
+                    SREG_S = SREG_N ^ SREG_V;
+                    GPR[rd + 1] = (byte)((result >> 8) & 0xFF);
+                    GPR[rd] = (byte)(result & 0xFF);
                     PC++;
                     words++;
                     cycles++;
-                    isHalted = true;
                 }
 
                 // AND
@@ -122,14 +135,21 @@ namespace AVRSim
                     isHalted = true;
                 }
 
-                // BRBC
-                // 1111 01kk kkkk ksss
-                else if ((currentInstruction & 0xFC00) == 0xF400)
+                // BREQ
+                // 1111 00kk kkkk k001
+                else if ((currentInstruction & 0xFC07) == 0xF001)
                 {
-                    PC++;
+                    if (SREG_Z)
+                    {
+                        PC += (((currentInstruction & 0x03F8) << 22) >> 25) + 1;
+                        cycles += 2;
+                    }
+                    else
+                    {
+                        PC++;
+                        cycles++;
+                    }
                     words++;
-                    cycles++; // 2 if cond is true
-                    isHalted = true;
                 }
 
                 // BRBS
@@ -169,16 +189,6 @@ namespace AVRSim
                     PC++;
                     words++;
                     cycles++;
-                    isHalted = true;
-                }
-
-                // BREQ
-                // 1111 00kk kkkk k001
-                else if ((currentInstruction & 0xFC07) == 0xF001)
-                {
-                    PC++;
-                    words++;
-                    cycles++; // 2 if cond is true
                     isHalted = true;
                 }
 
@@ -266,6 +276,23 @@ namespace AVRSim
                 // 1111 01kk kkkk k001
                 else if ((currentInstruction & 0xFC07) == 0xF401)
                 {
+                    if (!SREG_Z)
+                    {
+                        PC += (((currentInstruction & 0x03F8) << 22) >> 25) + 1;
+                        cycles += 2;
+                    }
+                    else
+                    {
+                        PC++;
+                        cycles++;
+                    }
+                    words++;
+                }
+
+                // BRBC
+                // 1111 01kk kkkk ksss
+                else if ((currentInstruction & 0xFC00) == 0xF400)
+                {
                     PC++;
                     words++;
                     cycles++; // 2 if cond is true
@@ -332,6 +359,16 @@ namespace AVRSim
                     isHalted = true;
                 }
 
+                // SEI
+                // 1001 0100 0111 1000
+                else if (currentInstruction == 0x9478)
+                {
+                    SREG_I = true;
+                    PC++;
+                    words++;
+                    cycles++;
+                }
+
                 // BSET
                 // 1001 0100 0sss 1000
                 else if ((currentInstruction & 0xFF8F) == 0x9408)
@@ -357,10 +394,17 @@ namespace AVRSim
                 // kkkk kkkk kkkk kkkk
                 else if ((currentInstruction & 0xFE0E) == 0x940E)
                 {
-                    PC += 2;
+                    nextInstruction = FLASH[PC + 1];
+                    SRAM[SP--] = (byte)((PC + 2) & 0xFF);
+                    SRAM[SP--] = (byte)(((PC + 2) >> 8) & 0xFF);
+
+                    //TODO: see avr instruction set manual
+                    //if (FLASH.Length > 0x20000)
+                    //    SRAM[SP--] = (byte)((PC + 3 >> 16) & 0xFF);
+
+                    PC = ((currentInstruction & 0x01F0) << 17) | ((currentInstruction & 0x1) << 16) | nextInstruction;
                     words += 2;
                     cycles += 4;
-                    isHalted = true;
                 }
 
                 // CBI
@@ -487,10 +531,18 @@ namespace AVRSim
                 // 0000 01rd dddd rrrr
                 else if ((currentInstruction & 0xFC00) == 0x0400)
                 {
+                    int rd = (currentInstruction >> 4) & 0x1F;
+                    int rr = ((currentInstruction >> 5) & 0x10) | (currentInstruction & 0xF);
+                    byte result = (byte)(GPR[rd] - GPR[rr] - (SREG_C ? 1 : 0));
+                    SREG_C = GPR[rr] + (SREG_C ? 1 : 0) > GPR[rd];
+                    SREG_Z &= result == 0;
+                    SREG_N = ((result & 0x80) >> 7) != 0;
+                    SREG_V = (((GPR[rd] & 0x80) >> 7) & ~((GPR[rr] & 0x80) >> 7) & ~((result & 0x80) >> 7) | ~((GPR[rd] & 0x80) >> 7) & ((GPR[rr] & 0x80) >> 7) & ((result & 0x80) >> 7)) != 0;
+                    SREG_S = SREG_N ^ SREG_V;
+                    SREG_H = (~((GPR[rd] & 0x8) >> 3) & ((GPR[rr] & 0x8) >> 3) | ((GPR[rr] & 0x8) >> 3) & ((result & 0x8) >> 3) | ((result & 0x8) >> 3) & ~((GPR[rd] & 0x8) >> 3)) != 0;
                     PC++;
                     words++;
                     cycles++;
-                    isHalted = true;
                 }
 
                 // CPI
@@ -672,10 +724,10 @@ namespace AVRSim
                 // 1011 0AAd dddd AAAA
                 else if ((currentInstruction & 0xF800) == 0xB000)
                 {
+                    GPR[(currentInstruction >> 4) & 0x1F] = IOR[((currentInstruction >> 5) & 0x30) | (currentInstruction & 0xF)];
                     PC++;
                     words++;
                     cycles++;
-                    isHalted = true;
                 }
 
                 // INC
@@ -854,10 +906,12 @@ namespace AVRSim
                 // kkkk kkkk kkkk kkkk
                 else if ((currentInstruction & 0xFE0F) == 0x9000)
                 {
+                    nextInstruction = FLASH[PC + 1];
+                    GPR[(currentInstruction >> 4) & 0x1F] = SRAM[nextInstruction + RAMPD];
+                    nextInstruction += RAMPD;
                     PC += 2;
                     words += 2;
                     cycles += 2;
-                    isHalted = true;
                 }
 
                 // LDS
@@ -921,13 +975,13 @@ namespace AVRSim
                 }
 
                 // MOV
-                // 1001 010d dddd 0110
+                // 0010 11rd dddd rrrr
                 else if ((currentInstruction & 0xFC00) == 0x2C00)
                 {
+                    GPR[(currentInstruction >> 4) & 0x1F] = GPR[((currentInstruction >> 5) & 0x10) | (currentInstruction & 0xF)];
                     PC++;
                     words++;
                     cycles++;
-                    isHalted = true;
                 }
 
                 // MOVW
@@ -1004,10 +1058,14 @@ namespace AVRSim
                 // 0110 KKKK dddd KKKK
                 else if ((currentInstruction & 0xF000) == 0x6000)
                 {
+                    GPR[((currentInstruction >> 4) & 0xF) + 0x10] |= (byte)(((currentInstruction >> 4) & 0xF0) | (currentInstruction & 0xF));
+                    SREG_Z = GPR[((currentInstruction >> 4) & 0xF) + 0x10] == 0;
+                    SREG_N = ((GPR[((currentInstruction >> 4) & 0xF) + 0x10] & 0x80) >> 7) != 0;
+                    SREG_V = false;
+                    SREG_S = SREG_N ^ SREG_V;
                     PC++;
                     words++;
                     cycles++;
-                    isHalted = true;
                 }
 
                 // OUT
@@ -1153,10 +1211,18 @@ namespace AVRSim
                 // 1001 0111 KKdd KKKK
                 else if ((currentInstruction & 0xFF00) == 0x9700)
                 {
+                    int rd = (((currentInstruction >> 4) & 0x3) * 2) + 24;
+                    ushort result = (ushort)(((GPR[rd + 1] << 8) | GPR[rd]) - (((currentInstruction >> 2) & 0x30) | (currentInstruction & 0xF)));
+                    SREG_C = (((result & 0x8000) >> 15) & ~((GPR[rd + 1] & 0x80) >> 7)) == 1;
+                    SREG_Z = result == 0;
+                    SREG_N = ((result & 0x8000) >> 15) != 0;
+                    SREG_V = (((result & 0x8000) >> 15) & ~((GPR[rd + 1] & 0x80) >> 7)) == 1;
+                    SREG_S = SREG_N ^ SREG_V;
+                    GPR[rd + 1] = (byte)((result >> 8) & 0xFF);
+                    GPR[rd] = (byte)(result & 0xFF);
                     PC++;
                     words++;
                     cycles += 2;
-                    isHalted = true;
                 }
 
                 // SBR
@@ -1202,16 +1268,6 @@ namespace AVRSim
                 // SEH
                 // 1001 0100 0101 1000
                 else if (currentInstruction == 0x9458)
-                {
-                    PC++;
-                    words++;
-                    cycles++;
-                    isHalted = true;
-                }
-
-                // SEI
-                // 1001 0100 0111 1000
-                else if (currentInstruction == 0x9478)
                 {
                     PC++;
                     words++;
@@ -1323,10 +1379,10 @@ namespace AVRSim
                 // 1001 001r rrrr 1101
                 else if ((currentInstruction & 0xFE0F) == 0x920D)
                 {
+                    SRAM[X++] = GPR[(currentInstruction >> 4) & 0x1F];
                     PC++;
                     words++;
                     cycles++;
-                    isHalted = true;
                 }
 
                 // ST -X
@@ -1424,10 +1480,12 @@ namespace AVRSim
                 // kkkk kkkk kkkk kkkk
                 else if ((currentInstruction & 0xFE0F) == 0x9200)
                 {
+                    nextInstruction = FLASH[PC + 1];
+                    SRAM[nextInstruction + RAMPD] = GPR[(currentInstruction >> 4) & 0x1F];
+                    nextInstruction += RAMPD;
                     PC += 2;
                     words += 2;
                     cycles += 2;
-                    isHalted = true;
                 }
 
                 // STS
@@ -1454,10 +1512,19 @@ namespace AVRSim
                 // 0101 KKKK dddd KKKK
                 else if ((currentInstruction & 0xF000) == 0x5000)
                 {
+                    int rd = ((currentInstruction >> 4) & 0xF) + 0x10;
+                    byte kk = (byte)(((currentInstruction >> 4) & 0xF0) | (currentInstruction & 0xF));
+                    byte result = (byte)(GPR[rd] - kk);
+                    SREG_C = kk > GPR[rd];
+                    SREG_Z = result == 0;
+                    SREG_N = ((result & 0x80) >> 7) != 0;
+                    SREG_V = (((GPR[rd] & 0x80) >> 7) & ~((kk & 0x80) >> 7) & ~((result & 0x80) >> 7) | ~((GPR[rd] & 0x80) >> 7) & ((kk & 0x80) >> 7) & ((result & 0x80) >> 7)) != 0;
+                    SREG_S = SREG_N ^ SREG_V;
+                    SREG_H = (~((GPR[rd] & 0x8) >> 3) & ((kk & 0x8) >> 3) | ((kk & 0x8) >> 3) & ((result & 0x8) >> 3) | ((result & 0x8) >> 3) & ~((GPR[rd] & 0x8) >> 3)) != 0;
+                    GPR[rd] = result;
                     PC++;
                     words++;
                     cycles++;
-                    isHalted = true;
                 }
 
                 // SWAP

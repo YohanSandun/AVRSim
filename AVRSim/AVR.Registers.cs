@@ -26,6 +26,57 @@ namespace AVRSim
         // General purpose and IO registers
         public Registers GPR, IOR;
 
+        public ushort X
+        {
+            get
+            {
+                return (ushort)((SRAM[27] << 8) | SRAM[26]);
+            }
+            set
+            {
+                SRAM[27] = (byte)((value >> 8) & 0xFF);
+                SRAM[26] = (byte)(value & 0xFF);
+            }
+        }
+
+        public ushort Y
+        {
+            get
+            {
+                return (ushort)((SRAM[29] << 8) | SRAM[28]);
+            }
+            set
+            {
+                SRAM[29] = (byte)((value >> 8) & 0xFF);
+                SRAM[28] = (byte)(value & 0xFF);
+            }
+        }
+
+        public ushort Z
+        {
+            get
+            {
+                return (ushort)((SRAM[31] << 8) | SRAM[30]);
+            }
+            set
+            {
+                SRAM[31] = (byte)((value >> 8) & 0xFF);
+                SRAM[30] = (byte)(value & 0xFF);
+            }
+        }
+
+        public byte RAMPD
+        {
+            get
+            {
+                return IOR[0x38];
+            }
+            set
+            {
+                IOR[0x38] = value;
+            }
+        }
+
         public class Registers
         {
             private int mStart { get; set; }

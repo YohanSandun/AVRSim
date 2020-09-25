@@ -67,7 +67,8 @@ namespace AVRSim
             // 1001 0110 KKdd KKKK
             else if ((currentInstruction & 0xFF00) == 0x9600)
             {
-                return "ADIW";
+                int rd = (((currentInstruction >> 4) & 0x3) * 2) + 24;
+                return "ADIW " + GetRegisterName(rd + 1) + ":" + GetRegisterName(rd) + ", " + GetHex(((currentInstruction >> 2) & 0x30) | (currentInstruction & 0xF));
             }
 
             // AND
@@ -105,11 +106,14 @@ namespace AVRSim
                 return "BLD";
             }
 
-            // BRBC
-            // 1111 01kk kkkk ksss
-            else if ((currentInstruction & 0xFC00) == 0xF400)
+            // BREQ
+            // 1111 00kk kkkk k001
+            else if ((currentInstruction & 0xFC07) == 0xF001)
             {
-                return "BRBC";
+                int adr = (((currentInstruction & 0x03F8) << 22) >> 25) + 1;
+                if (adr < 0)
+                    return "BREQ -" + GetHexByte(adr * -1);
+                return "BREQ +" + GetHexByte(adr);
             }
 
             // BRBS
@@ -140,12 +144,6 @@ namespace AVRSim
                 return "BREAK";
             }
 
-            // BREQ
-            // 1111 00kk kkkk k001
-            else if ((currentInstruction & 0xFC07) == 0xF001)
-            {
-                return "BREQ";
-            }
 
             // BRGE
             // 1111 01kk kkkk k100
@@ -207,7 +205,17 @@ namespace AVRSim
             // 1111 01kk kkkk k001
             else if ((currentInstruction & 0xFC07) == 0xF401)
             {
-                return "BRNE";
+                int adr = (((currentInstruction & 0x03F8) << 22) >> 25) + 1;
+                if (adr < 0)
+                    return "BRNE -" + GetHexByte(adr * -1);
+                return "BRNE +" + GetHexByte(adr);
+            }
+
+            // BRBC
+            // 1111 01kk kkkk ksss
+            else if ((currentInstruction & 0xFC00) == 0xF400)
+            {
+                return "BRBC";
             }
 
             // BRPL
@@ -252,6 +260,13 @@ namespace AVRSim
                 return "BRVS";
             }
 
+            // SEI
+            // 1001 0100 0111 1000
+            else if (currentInstruction == 0x9478)
+            {
+                return "SEI";
+            }
+
             // BSET
             // 1001 0100 0sss 1000
             else if ((currentInstruction & 0xFF8F) == 0x9408)
@@ -271,7 +286,7 @@ namespace AVRSim
             // kkkk kkkk kkkk kkkk
             else if ((currentInstruction & 0xFE0E) == 0x940E)
             {
-                return "CALL";
+                return "CALL " + GetHex(((currentInstruction & 0x01F0) << 17) | ((currentInstruction & 0x1) << 16) | nextInstruction);
             }
 
             // CBI
@@ -362,7 +377,7 @@ namespace AVRSim
             // 0000 01rd dddd rrrr
             else if ((currentInstruction & 0xFC00) == 0x0400)
             {
-                return "CPC";
+                return "CPC " + GetRd(currentInstruction) + ", " + GetRr(currentInstruction);
             }
 
             // CPI
@@ -476,7 +491,7 @@ namespace AVRSim
             // 1011 0AAd dddd AAAA
             else if ((currentInstruction & 0xF800) == 0xB000)
             {
-                return "IN";
+                return "IN " + GetRd(currentInstruction) + ", " + GetRegisterName((((currentInstruction >> 5) & 0x30) | (currentInstruction & 0xF)) + 0x20);
             }
 
             // INC
@@ -604,7 +619,7 @@ namespace AVRSim
             // kkkk kkkk kkkk kkkk
             else if ((currentInstruction & 0xFE0F) == 0x9000)
             {
-                return "LDS ";
+                return "LDS " + GetRd(currentInstruction) + ", " + GetHex(nextInstruction);
             }
 
             // LDS
@@ -650,10 +665,10 @@ namespace AVRSim
             }
 
             // MOV
-            // 1001 010d dddd 0110
+            // 0010 11rd dddd rrrr
             else if ((currentInstruction & 0xFC00) == 0x2C00)
             {
-                return "MOV";
+                return "MOV " + GetRd(currentInstruction) + ", " + GetRr(currentInstruction);
             }
 
             // MOVW
@@ -709,7 +724,7 @@ namespace AVRSim
             // 0110 KKKK dddd KKKK
             else if ((currentInstruction & 0xF000) == 0x6000)
             {
-                return "ORI";
+                return "ORI " + GetRegisterName(((currentInstruction >> 4) & 0xF) + 0x10) + ", " + GetHexByte(((currentInstruction >> 4) & 0xF0) | (currentInstruction & 0xF));
             }
 
             // OUT
@@ -817,7 +832,8 @@ namespace AVRSim
             // 1001 0111 KKdd KKKK
             else if ((currentInstruction & 0xFF00) == 0x9700)
             {
-                return "SBIW";
+                int rd = (((currentInstruction >> 4) & 0x3) * 2) + 24;
+                return "SBIW " + GetRegisterName(rd + 1) + ":" + GetRegisterName(rd) + ", " + GetHex(((currentInstruction >> 2) & 0x30) | (currentInstruction & 0xF));
             }
 
             // SBR
@@ -853,13 +869,6 @@ namespace AVRSim
             else if (currentInstruction == 0x9458)
             {
                 return "SEH";
-            }
-
-            // SEI
-            // 1001 0100 0111 1000
-            else if (currentInstruction == 0x9478)
-            {
-                return "SEI";
             }
 
             // SEN
@@ -936,7 +945,7 @@ namespace AVRSim
             // 1001 001r rrrr 1101
             else if ((currentInstruction & 0xFE0F) == 0x920D)
             {
-                return "ST X+";
+                return "ST X+, " + GetRegisterName((currentInstruction >> 4) & 0x1F);
             }
 
             // ST -X
@@ -1007,7 +1016,7 @@ namespace AVRSim
             // kkkk kkkk kkkk kkkk
             else if ((currentInstruction & 0xFE0F) == 0x9200)
             {
-                return "STS";
+                return "STS " + GetHex(nextInstruction) + ", " + GetRd(currentInstruction);
             }
 
             // STS
@@ -1028,7 +1037,7 @@ namespace AVRSim
             // 0101 KKKK dddd KKKK
             else if ((currentInstruction & 0xF000) == 0x5000)
             {
-                return "SUBI";
+                return "SUBI " + GetRegisterName(((currentInstruction >> 4) & 0xF) + 0x10) + ", " + GetHexByte(((currentInstruction >> 4) & 0xF0) | (currentInstruction & 0xF));
             }
 
             // SWAP
@@ -1061,7 +1070,7 @@ namespace AVRSim
             return "XCH";
         }
 
-        private static string GetRegisterName(int register)
+        public static string GetRegisterName(int register)
         {
             if (register <= 25)
                 return "R" + register;
