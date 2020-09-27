@@ -49,47 +49,449 @@ namespace AVRSim
 
         public static string GetInstructionString(int currentInstruction, int nextInstruction)
         {
-            // ADC
-            // 0001 11rd dddd rrrr
-            if ((currentInstruction & 0xFC00) == 0x1C00)
+            // CLI
+            // 1001 0100 1111 1000
+            if (currentInstruction == 0x94F8)
             {
-                return "ADC " + GetRd(currentInstruction) + ", " + GetRr(currentInstruction);
+                return "CLI";
+            }
+
+            // BREAK
+            // 1001 0101 1001 1000
+            else if (currentInstruction == 0x9598)
+            {
+                return "BREAK";
+            }
+
+            // SEI
+            // 1001 0100 0111 1000
+            else if (currentInstruction == 0x9478)
+            {
+                return "SEI";
+            }
+
+            // CLC
+            // 1001 0100 1000 1000
+            else if (currentInstruction == 0x9488)
+            {
+                return "";
+            }
+
+            // CLH
+            // 1001 0100 1101 1000
+            else if (currentInstruction == 0x94D8)
+            {
+                return "CLC";
+            }
+
+            // CLN
+            // 1001 0100 1010 1000
+            else if (currentInstruction == 0x94A8)
+            {
+                return "CLN";
+            }
+
+            // CLS
+            // 1001 0100 1100 1000
+            else if (currentInstruction == 0x94C8)
+            {
+                return "CLS";
+            }
+
+            // CLT
+            // 1001 0100 1110 1000
+            else if (currentInstruction == 0x94E8)
+            {
+                return "CLT";
+            }
+
+            // CLV
+            // 1001 0100 1011 1000
+            else if (currentInstruction == 0x94B8)
+            {
+                return "CLV";
+            }
+
+            // CLZ
+            // 1001 0100 1001 1000
+            else if (currentInstruction == 0x9498)
+            {
+                return "CLZ";
+            }
+
+            // EICALL
+            // 1001 0101 0001 1001
+            else if (currentInstruction == 0x9519)
+            {
+                return "EICALL";
+            }
+
+            // EIJMP
+            // 1001 0100 0001 1001
+            else if (currentInstruction == 0x9419)
+            {
+                return "EIJMP";
+            }
+
+            // ELPM
+            // 1001 0101 1101 1000
+            else if (currentInstruction == 0x95D8)
+            {
+                return "ELPM";
+            }
+
+            // ICALL
+            // 1001 0101 0000 1001
+            else if (currentInstruction == 0x9509)
+            {
+                return "ICALL";
+            }
+
+            // IJMP
+            // 1001 0100 0000 1001
+            else if (currentInstruction == 0x9409)
+            {
+                return "IJMP";
+            }
+
+            // LPM
+            // 1001 0101 1100 1000
+            else if (currentInstruction == 0x95C8)
+            {
+                return "LPM";
+            }
+
+            // NOP
+            // 0000 0000 0000 0000
+            else if (currentInstruction == 0x0000)
+            {
+                return "NOP";
+            }
+
+            // RET
+            // 1001 0101 0000 1000
+            else if (currentInstruction == 0x9508)
+            {
+                return "RET";
+            }
+
+            // RETI
+            // 1001 0101 0001 1000
+            else if (currentInstruction == 0x9518)
+            {
+                return "RETI";
+            }
+
+            // SEC
+            // 1001 0100 0000 1000
+            else if (currentInstruction == 0x9408)
+            {
+                return "SEC";
+            }
+
+            // SEH
+            // 1001 0100 0101 1000
+            else if (currentInstruction == 0x9458)
+            {
+                return "SEH";
+            }
+
+            // SEN
+            // 1001 0100 0010 1000
+            else if (currentInstruction == 0x9428)
+            {
+                return "SEN";
+            }
+
+            // SES
+            // 1001 0100 0100 1000
+            else if (currentInstruction == 0x9448)
+            {
+                return "SES";
+            }
+
+            // SET
+            // 1001 0100 0110 1000
+            else if (currentInstruction == 0x9468)
+            {
+                return "SET";
+            }
+
+            // SEV
+            // 1001 0100 0011 1000
+            else if (currentInstruction == 0x9438)
+            {
+                return "SEV";
+            }
+
+            // SEZ
+            // 1001 0100 0001 1000
+            else if (currentInstruction == 0x9418)
+            {
+                return "SEZ";
+            }
+
+            // SLEEP
+            // 1001 0101 1000 1000
+            else if (currentInstruction == 0x9588)
+            {
+                return "SLEEP";
+            }
+
+            // SPM
+            // 1001 0101 1110 1000
+            else if (currentInstruction == 0x95E8)
+            {
+                return "SPM";
+            }
+
+            // SPM
+            // 1001 0101 1110 1000
+            else if (currentInstruction == 0x95F8)
+            {
+                return "SPM";
+            }
+
+            // WDR
+            // 1001 0101 1010 1000
+            else if (currentInstruction == 0x95A8)
+            {
+                return "WDR";
+            }
+
+            // LSL
+            // 0000 11dd dddd dddd
+            else if ((currentInstruction & 0xFC00) == 0x0C00)
+            {
+                return "LSL";
+            }
+
+            // XCH
+            // 1001 0101 1010 1000
+            else if ((currentInstruction & 0xFE0F) == 0x9204)
+            {
+                return "XCH";
+            }
+
+            #region 0000
+
+            // FMUL
+            // 0000 0011 0ddd 1rrr
+            else if ((currentInstruction & 0xFF88) == 0x0308)
+            {
+                return "FMUL";
+            }
+
+            // MULSU
+            // 0000 0011 0ddd 0rrr
+            else if ((currentInstruction & 0xFF88) == 0x0300)
+            {
+                return "MULSU";
+            }
+
+            // FMULS
+            // 0000 0011 1ddd 0rrr
+            else if ((currentInstruction & 0xFF88) == 0x0380)
+            {
+                return "FMULS";
+            }
+
+            // FMULSU
+            // 0000 0011 1ddd 1rrr
+            else if ((currentInstruction & 0xFF88) == 0x0388)
+            {
+                return "FMULSU";
+            }
+
+            // MOVW
+            // 0000 0001 dddd rrrr
+            else if ((currentInstruction & 0xFF00) == 0x0100)
+            {
+                return "MOVW " + GetRegisterName((((currentInstruction >> 4) & 0xF) << 1) + 1) + ":" + GetRegisterName(((currentInstruction >> 4) & 0xF) << 1) + ", " + GetRegisterName(((currentInstruction & 0xF) << 1) + 1) + ":" + GetRegisterName((currentInstruction & 0xF) << 1);
+            }
+
+            // MULS
+            // 0000 0010 dddd rrrr
+            else if ((currentInstruction & 0xFF00) == 0x0200)
+            {
+                return "MULS";
             }
 
             // ADD
             // 0000 11rd dddd rrrr
             else if ((currentInstruction & 0xFC00) == 0x0C00)
             {
-                return "ADD " + GetRd(currentInstruction) + ", " + GetRr(currentInstruction);
+                string rd = GetRd(currentInstruction);
+                string rr = GetRr(currentInstruction);
+                if (rd == rr)
+                    return "LSL " + rd;
+                else
+                    return "ADD " + rd + ", " + rr;
             }
 
-            // ADIW
-            // 1001 0110 KKdd KKKK
-            else if ((currentInstruction & 0xFF00) == 0x9600)
+            // CPC
+            // 0000 01rd dddd rrrr
+            else if ((currentInstruction & 0xFC00) == 0x0400)
             {
-                int rd = (((currentInstruction >> 4) & 0x3) * 2) + 24;
-                return "ADIW " + GetRegisterName(rd + 1) + ":" + GetRegisterName(rd) + ", " + GetHex(((currentInstruction >> 2) & 0x30) | (currentInstruction & 0xF));
+                return "CPC " + GetRd(currentInstruction) + ", " + GetRr(currentInstruction);
             }
 
+            // SBC
+            // 0000 10rd dddd rrrr
+            else if ((currentInstruction & 0xFC00) == 0x0800)
+            {
+                return "SBC " + GetRd(currentInstruction) + ", " + GetRr(currentInstruction);
+            }
+            #endregion
+
+            #region 0001
+            // ADC
+            // 0001 11rd dddd rrrr
+            else if ((currentInstruction & 0xFC00) == 0x1C00)
+            {
+                string rd = GetRd(currentInstruction);
+                string rr = GetRr(currentInstruction);
+                if (rd == rr)
+                    return "ROL " + rd;
+                else
+                    return "ADC " + rd + ", " + rr;
+            }
+
+            // CP
+            // 0001 01rd dddd rrrr
+            else if ((currentInstruction & 0xFC00) == 0x1400)
+            {
+                return "CP " + GetRd(currentInstruction) + ", " + GetRr(currentInstruction);
+            }
+
+            // CPSE
+            // 0001 00rd dddd rrrr
+            else if ((currentInstruction & 0xFC00) == 0x1000)
+            {
+                return "CPSE " + GetRd(currentInstruction) + ", " + GetRr(currentInstruction);
+            }
+
+            // SUB
+            // 0001 10rd dddd rrrr
+            else if ((currentInstruction & 0xFC00) == 0x1800)
+            {
+                return "SUB " + GetRd(currentInstruction) + ", " + GetRr(currentInstruction);
+            }
+            #endregion
+
+            #region 0010
             // AND
             // 0010 00rd dddd rrrr
             else if ((currentInstruction & 0xFC00) == 0x2000)
             {
-                return "AND";
+                return "AND " + GetRd(currentInstruction) + ", " + GetRr(currentInstruction);
             }
 
+            // EOR
+            // 0010 01rd dddd rrrr
+            else if ((currentInstruction & 0xFC00) == 0x2400)
+            {
+                if (GetRd(currentInstruction).Equals(GetRr(currentInstruction)))
+                    return "CLR " + GetRd(currentInstruction);
+                return "EOR " + GetRd(currentInstruction) + ", " + GetRr(currentInstruction);
+            }
+
+            // MOV
+            // 0010 11rd dddd rrrr
+            else if ((currentInstruction & 0xFC00) == 0x2C00)
+            {
+                return "MOV " + GetRd(currentInstruction) + ", " + GetRr(currentInstruction);
+            }
+
+            // OR
+            // 0010 10rd dddd rrrr
+            else if ((currentInstruction & 0xFC00) == 0x2800)
+            {
+                return "OR " + GetRd(currentInstruction) + ", " + GetRr(currentInstruction);
+            }
+            #endregion
+
+            #region 0011
+            // CPI
+            // 0011 KKKK dddd KKKK
+            else if ((currentInstruction & 0xF000) == 0x3000)
+            {
+                return "CPI " + GetRegisterName(((currentInstruction >> 4) & 0xF) + 0x10) + ", " + GetHexByte(((currentInstruction >> 4) & 0xF0) | (currentInstruction & 0xF));
+            }
+            #endregion
+
+            #region 0100
+            // SBCI
+            // 0100 KKKK dddd KKKK
+            else if ((currentInstruction & 0xF000) == 0x4000)
+            {
+                return "SBCI " + GetRegisterName(((currentInstruction >> 4) & 0xF) + 0x10) + ", " + GetHexByte(((currentInstruction >> 4) & 0xF0) | (currentInstruction & 0xF));
+            }
+            #endregion
+
+            #region 0101
+            // SUBI
+            // 0101 KKKK dddd KKKK
+            else if ((currentInstruction & 0xF000) == 0x5000)
+            {
+                return "SUBI " + GetRegisterName(((currentInstruction >> 4) & 0xF) + 0x10) + ", " + GetHexByte(((currentInstruction >> 4) & 0xF0) | (currentInstruction & 0xF));
+            }
+            #endregion
+
+            #region 0110
+            // ORI or SBR
+            // 0110 KKKK dddd KKKK
+            else if ((currentInstruction & 0xF000) == 0x6000)
+            {
+                return "ORI " + GetRegisterName(((currentInstruction >> 4) & 0xF) + 0x10) + ", " + GetHexByte(((currentInstruction >> 4) & 0xF0) | (currentInstruction & 0xF));
+            }
+            #endregion
+
+            #region 0111
             // ANDI
             // 0111 KKKK dddd KKKK
             else if ((currentInstruction & 0xF000) == 0x7000)
             {
-                return "ANDI";
+                return "ANDI " + GetRegisterName(((currentInstruction >> 4) & 0xF) + 0x10) + ", " + GetHexByte(((currentInstruction >> 4) & 0xF0) | (currentInstruction & 0xF));
+            }
+            #endregion
+
+            #region 1000
+            // LD Y
+            // 1000 000d dddd 1000
+            else if ((currentInstruction & 0xFE0F) == 0x8008)
+            {
+                return "LD Y";
             }
 
-            // ASR
-            // 1001 010d dddd 0101
-            else if ((currentInstruction & 0xFE0F) == 0x9405)
+            // LD Z
+            // 1000 000d dddd 0000
+            else if ((currentInstruction & 0xFE0F) == 0x8000)
             {
-                return "ASR";
+                return "LD " + GetRd(currentInstruction) + ", Z";
+            }
+
+            // ST Y
+            // 1000 001r rrrr 1000
+            else if ((currentInstruction & 0xFE0F) == 0x8208)
+            {
+                return "ST Y";
+            }
+
+            // ST Z
+            // 1000 001r rrrr 0000
+            else if ((currentInstruction & 0xFE0F) == 0x8200)
+            {
+                return "ST Z";
+            }
+            #endregion
+
+            #region 1001
+            // BSET
+            // 1001 0100 0sss 1000
+            else if ((currentInstruction & 0xFF8F) == 0x9408)
+            {
+                return "BSET";
             }
 
             // BCLR
@@ -99,13 +501,395 @@ namespace AVRSim
                 return "BCLR";
             }
 
-            // BLD
-            // 1111 100d dddd 0bbb
-            else if ((currentInstruction & 0xFE08) == 0xF800)
+            // DES
+            // 1001 0100 KKKK 1011
+            else if ((currentInstruction & 0xFF0F) == 0x940B)
             {
-                return "BLD";
+                return "DES";
             }
 
+            // ASR
+            // 1001 010d dddd 0101
+            else if ((currentInstruction & 0xFE0F) == 0x9405)
+            {
+                return "ASR";
+            }
+
+            // COM
+            // 1001 010d dddd 0000
+            else if ((currentInstruction & 0xFE0F) == 0x9400)
+            {
+                return "COM " + GetRd(currentInstruction);
+            }
+
+            // DEC
+            // 1001 010d dddd 1010
+            else if ((currentInstruction & 0xFE0F) == 0x940A)
+            {
+                return "DEC " + GetRd(currentInstruction);
+            }
+
+            // ELPM Z
+            // 1001 000d dddd 0110
+            else if ((currentInstruction & 0xFE0F) == 0x9006)
+            {
+                return "ELPM Z";
+            }
+
+            // ELPM Z+
+            // 1001 000d dddd 0111
+            else if ((currentInstruction & 0xFE0F) == 0x9007)
+            {
+                return "ELPM Z+";
+            }
+
+            // INC
+            // 1001 010d dddd 0011
+            else if ((currentInstruction & 0xFE0F) == 0x9403)
+            {
+                return "INC " + GetRd(currentInstruction);
+            }
+
+            // LAC
+            // 1001 001r rrrr 0110
+            else if ((currentInstruction & 0xFE0F) == 0x9206)
+            {
+                return "LAC";
+            }
+
+            // LAS
+            // 1001 001r rrrr 0101
+            else if ((currentInstruction & 0xFE0F) == 0x9205)
+            {
+                return "LAS";
+            }
+
+            // LAT
+            // 1001 001r rrrr 0111
+            else if ((currentInstruction & 0xFE0F) == 0x9207)
+            {
+                return "LAT";
+            }
+
+            // LD X
+            // 1001 000d dddd 1100
+            else if ((currentInstruction & 0xFE0F) == 0x900C)
+            {
+                return "LD " + GetRd(currentInstruction) + ", X";
+            }
+
+            // LD X+
+            // 1001 000d dddd 1101
+            else if ((currentInstruction & 0xFE0F) == 0x900D)
+            {
+                return "LD X+";
+            }
+
+            // LD -X
+            // 1001 000d dddd 1110
+            else if ((currentInstruction & 0xFE0F) == 0x900E)
+            {
+                return "LD -X";
+            }
+
+            // LD Y+
+            // 1001 000d dddd 1001
+            else if ((currentInstruction & 0xFE0F) == 0x9009)
+            {
+                return "LD Y+";
+            }
+
+            // LD -Y
+            // 1001 000d dddd 1010
+            else if ((currentInstruction & 0xFE0F) == 0x900A)
+            {
+                return "LD -Y";
+            }
+
+            // LD Z+
+            // 1001 000d dddd 0001
+            else if ((currentInstruction & 0xFE0F) == 0x9001)
+            {
+                return "LD Z+";
+            }
+
+            // LD -Z
+            // 1001 000d dddd 0010
+            else if ((currentInstruction & 0xFE0F) == 0x9002)
+            {
+                return "LD -Z";
+            }
+
+            // LPM Z
+            // 1001 000d dddd 0100
+            else if ((currentInstruction & 0xFE0F) == 0x9004)
+            {
+                return "LPM " + GetRd(currentInstruction) + ", Z";
+            }
+
+            // LPM Z+
+            // 1001 000d dddd 0101
+            else if ((currentInstruction & 0xFE0F) == 0x9005)
+            {
+                return "LPM " + GetRd(currentInstruction) + ", Z+";
+            }
+
+            // LSR
+            // 1001 010d dddd 0110
+            else if ((currentInstruction & 0xFE0F) == 0x9406)
+            {
+                return "LSR " + GetRd(currentInstruction);
+            }
+
+            // NEG
+            // 1001 010d dddd 0001
+            else if ((currentInstruction & 0xFE0F) == 0x9401)
+            {
+                return "NEG";
+            }
+
+            // POP
+            // 1001 000d dddd 1111
+            else if ((currentInstruction & 0xFE0F) == 0x900F)
+            {
+                return "POP " + GetRd(currentInstruction);
+            }
+
+            // PUSH
+            // 1001 001d dddd 1111
+            else if ((currentInstruction & 0xFE0F) == 0x920F)
+            {
+                return "PUSH " + GetRd(currentInstruction);
+            }
+
+            // ROR
+            // 1001 010d dddd 0111
+            else if ((currentInstruction & 0xFE0F) == 0x9407)
+            {
+                return "ROR " + GetRd(currentInstruction);
+            }
+
+            // ST X
+            // 1001 001r rrrr 1100
+            else if ((currentInstruction & 0xFE0F) == 0x920C)
+            {
+                return "ST X, " + GetRd(currentInstruction);
+            }
+
+            // ST X+
+            // 1001 001r rrrr 1101
+            else if ((currentInstruction & 0xFE0F) == 0x920D)
+            {
+                return "ST X+, " + GetRegisterName((currentInstruction >> 4) & 0x1F);
+            }
+
+            // ST -X
+            // 1001 001r rrrr 1110
+            else if ((currentInstruction & 0xFE0F) == 0x920E)
+            {
+                return "ST -X";
+            }
+
+            // ST Y+
+            // 1001 001r rrrr 1001
+            else if ((currentInstruction & 0xFE0F) == 0x9209)
+            {
+                return "ST Y+";
+            }
+
+            // ST -Y
+            // 1001 001r rrrr 1010
+            else if ((currentInstruction & 0xFE0F) == 0x920A)
+            {
+                return "ST -Y";
+            }
+
+            // ST Z+
+            // 1001 001r rrrr 0001
+            else if ((currentInstruction & 0xFE0F) == 0x9201)
+            {
+                return "ST Z+";
+            }
+
+            // ST -Z
+            // 1001 001r rrrr 0010
+            else if ((currentInstruction & 0xFE0F) == 0x9202)
+            {
+                return "ST -Z";
+            }
+
+            // SWAP
+            // 1001 010d dddd 0010
+            else if ((currentInstruction & 0xFE0F) == 0x9402)
+            {
+                return "SWAP";
+            }
+
+            // TST
+            // 1001 010d dddd 0010
+            else if ((currentInstruction & 0xFC00) == 0x2000)
+            {
+                return "TST";
+            }
+
+            // STS
+            // 1001 001d dddd 0000
+            // kkkk kkkk kkkk kkkk
+            else if ((currentInstruction & 0xFE0F) == 0x9200)
+            {
+                return "STS " + GetHex(nextInstruction) + ", " + GetRd(currentInstruction);
+            }
+
+            // LDS
+            // 1001 000d dddd 0000
+            // kkkk kkkk kkkk kkkk
+            else if ((currentInstruction & 0xFE0F) == 0x9000)
+            {
+                return "LDS " + GetRd(currentInstruction) + ", " + GetHex(nextInstruction);
+            }
+
+            // CALL
+            // 1001 010k kkkk 111k
+            // kkkk kkkk kkkk kkkk
+            else if ((currentInstruction & 0xFE0E) == 0x940E)
+            {
+                return "CALL " + GetHex(((currentInstruction & 0x01F0) << 17) | ((currentInstruction & 0x1) << 16) | nextInstruction);
+            }
+
+            // JMP
+            // 1001 010k kkkk 110k
+            // kkkk kkkk kkkk kkkk
+            else if ((currentInstruction & 0xFE0E) == 0x940C)
+            {
+                return "JMP " + GetHex(nextInstruction);
+            }
+
+            // CBI
+            // 1001 1000 AAAA Abbb
+            else if ((currentInstruction & 0xFF00) == 0x9800)
+            {
+                return "CBI";
+            }
+
+            // SBI
+            // 1001 1010 AAAA Abbb
+            else if ((currentInstruction & 0xFF00) == 0x9A00)
+            {
+                return "SBI";
+            }
+
+            // SBIC
+            // 1001 1001 AAAA Abbb
+            else if ((currentInstruction & 0xFF00) == 0x9900)
+            {
+                return "SBIC";
+            }
+
+            // SBIS
+            // 1001 1011 AAAA Abbb
+            else if ((currentInstruction & 0xFF00) == 0x9B00)
+            {
+                return "SBIS " + GetRegisterName((currentInstruction >> 3 & 0x1F)) + ", " + (currentInstruction & 0x7);
+            }
+
+            // CBR
+            // 1001 1000 AAAA Abbb
+            //else if ((currentInstruction & 0xFF00) == 0x9800)
+            //{
+            //    return "CBR";
+            //}
+
+            // ADIW
+            // 1001 0110 KKdd KKKK
+            else if ((currentInstruction & 0xFF00) == 0x9600)
+            {
+                int rd = (((currentInstruction >> 4) & 0x3) * 2) + 24;
+                return "ADIW " + GetRegisterName(rd + 1) + ":" + GetRegisterName(rd) + ", " + GetHex(((currentInstruction >> 2) & 0x30) | (currentInstruction & 0xF));
+            }
+
+            // SBIW
+            // 1001 0111 KKdd KKKK
+            else if ((currentInstruction & 0xFF00) == 0x9700)
+            {
+                int rd = (((currentInstruction >> 4) & 0x3) * 2) + 24;
+                return "SBIW " + GetRegisterName(rd + 1) + ":" + GetRegisterName(rd) + ", " + GetHex(((currentInstruction >> 2) & 0x30) | (currentInstruction & 0xF));
+            }
+
+            // MUL
+            // 1001 11rd dddd rrrr
+            else if ((currentInstruction & 0xFC00) == 0x9C00)
+            {
+                return "MUL";
+            }
+            #endregion
+
+            #region 1010
+            // LDS
+            // 1010 0kkk dddd kkkk
+            else if ((currentInstruction & 0xF800) == 0xA000)
+            {
+                return "LDS";
+            }
+
+            // STS
+            // 1010 1kkk dddd kkkk
+            else if ((currentInstruction & 0xF800) == 0xA800)
+            {
+                return "STS";
+            }
+            #endregion
+
+            #region 1011
+            // IN
+            // 1011 0AAd dddd AAAA
+            else if ((currentInstruction & 0xF800) == 0xB000)
+            {
+                return "IN " + GetRd(currentInstruction) + ", " + GetRegisterName((((currentInstruction >> 5) & 0x30) | (currentInstruction & 0xF)) + 0x20);
+            }
+
+            // OUT
+            // 1011 1AAr rrrr AAAA
+            else if ((currentInstruction & 0xF800) == 0xB800)
+            {
+                return "OUT " + GetRegisterName((((currentInstruction >> 5) & 0x30) | (currentInstruction & 0xF)) + 0x20) + ", " + GetRd(currentInstruction);
+            }
+            #endregion
+
+            #region 1100
+            // RJMP
+            // 1100 kkkk kkkk kkkk
+            else if ((currentInstruction & 0xF000) == 0xC000)
+            {
+                int pos = ((currentInstruction << 20) >> 20) + 1;
+                if (pos < 0)
+                    return "RJMP -" + GetHexByte(pos * -1);
+                return "RJMP +" + GetHexByte(pos);
+            }
+            #endregion
+
+            #region 1101
+            // RCALL
+            // 1101 kkkk kkkk kkkk
+            else if ((currentInstruction & 0xF000) == 0xD000)
+            {
+                return "RCALL";
+            }
+            #endregion
+
+            #region 1110
+            // LDI
+            // 1110 KKKK dddd KKKK
+            else if ((currentInstruction & 0xF000) == 0xE000)
+            {
+                int val = (currentInstruction >> 4) & 0xF0 | (currentInstruction & 0xF);
+                if (val == 0xFF)
+                    return "SER " + GetRegisterName(((currentInstruction >> 4) & 0xF) + 0x10);
+                else
+                    return "LDI " + GetRegisterName(((currentInstruction >> 4) & 0xF) + 0x10) + ", " + GetHexByte(val);
+            }
+            #endregion
+
+            #region 1111
             // BREQ
             // 1111 00kk kkkk k001
             else if ((currentInstruction & 0xFC07) == 0xF001)
@@ -116,40 +900,37 @@ namespace AVRSim
                 return "BREQ +" + GetHexByte(adr);
             }
 
-            // BRBS
-            // 1111 00kk kkkk ksss
-            else if ((currentInstruction & 0xFC00) == 0xF000)
+            // BRCS
+            // 1111 00kk kkkk k000
+            else if ((currentInstruction & 0xFC07) == 0xF000)
             {
-                return "BRBS";
+                int adr = (((currentInstruction & 0x03F8) << 22) >> 25) + 1;
+                if (adr < 0)
+                    return "BRCS -" + GetHex(adr * -1);
+                else
+                    return "BRCS +" + GetHex(adr);
             }
 
             // BRCC
             // 1111 01kk kkkk k000
             else if ((currentInstruction & 0xFC07) == 0xF400)
             {
-                return "BRCC";
+                int adr = (((currentInstruction & 0x03F8) << 22) >> 25) + 1;
+                if (adr < 0)
+                    return "BRCC -" + GetHex(adr * -1);
+                else
+                    return "BRCC +" + GetHex(adr);
             }
-
-            // BRCS
-            // 1111 00kk kkkk k000
-            else if ((currentInstruction & 0xFC07) == 0xF000)
-            {
-                return "BRCS";
-            }
-
-            // BREAK
-            // 1001 0101 1001 1000
-            else if (currentInstruction == 0x9598)
-            {
-                return "BREAK";
-            }
-
 
             // BRGE
             // 1111 01kk kkkk k100
             else if ((currentInstruction & 0xFC07) == 0xF404)
             {
-                return "BRGE";
+                int adr = (((currentInstruction & 0x03F8) << 22) >> 25) + 1;
+                if (adr < 0)
+                    return "BRGE -" + GetHex(adr * -1);
+                else
+                    return "BRGE +" + GetHex(adr);
             }
 
             // BRHC
@@ -211,11 +992,14 @@ namespace AVRSim
                 return "BRNE +" + GetHexByte(adr);
             }
 
-            // BRBC
-            // 1111 01kk kkkk ksss
-            else if ((currentInstruction & 0xFC00) == 0xF400)
+            // BRTC
+            // 1111 01kk kkkk k110
+            else if ((currentInstruction & 0xFC07) == 0xF406)
             {
-                return "BRBC";
+                int adr = (((currentInstruction & 0x03F8) << 22) >> 25) + 1;
+                if (adr < 0)
+                    return "BRTC -" + GetHexByte(adr * -1);
+                return "BRTC +" + GetHexByte(adr);
             }
 
             // BRPL
@@ -231,13 +1015,6 @@ namespace AVRSim
             //{
             //    return "BRSH";
             //}
-
-            // BRTC
-            // 1111 01kk kkkk k110
-            else if ((currentInstruction & 0xFC07) == 0xF406)
-            {
-                return "BRTC";
-            }
 
             // BRTS
             // 1111 00kk kkkk k110
@@ -260,814 +1037,80 @@ namespace AVRSim
                 return "BRVS";
             }
 
-            // SEI
-            // 1001 0100 0111 1000
-            else if (currentInstruction == 0x9478)
+            // BLD
+            // 1111 100d dddd 0bbb
+            else if ((currentInstruction & 0xFE08) == 0xF800)
             {
-                return "SEI";
-            }
-
-            // BSET
-            // 1001 0100 0sss 1000
-            else if ((currentInstruction & 0xFF8F) == 0x9408)
-            {
-                return "BSET";
+                return "BLD";
             }
 
             // BST
             // 1111 101d dddd 0bbb
             else if ((currentInstruction & 0xFE08) == 0xFA00)
             {
-                return "BST";
-            }
-
-            // CALL
-            // 1001 010k kkkk 111k
-            // kkkk kkkk kkkk kkkk
-            else if ((currentInstruction & 0xFE0E) == 0x940E)
-            {
-                return "CALL " + GetHex(((currentInstruction & 0x01F0) << 17) | ((currentInstruction & 0x1) << 16) | nextInstruction);
-            }
-
-            // CBI
-            // 1001 1000 AAAA Abbb
-            else if ((currentInstruction & 0xFF00) == 0x9800)
-            {
-                return "CBI";
-            }
-
-            // CBR
-            // 1001 1000 AAAA Abbb
-            //else if ((currentInstruction & 0xFF00) == 0x9800)
-            //{
-            //    return "CBR";
-            //}
-
-            // CLC
-            // 1001 0100 1000 1000
-            else if (currentInstruction == 0x9488)
-            {
-                return "";
-            }
-
-            // CLH
-            // 1001 0100 1101 1000
-            else if (currentInstruction == 0x94D8)
-            {
-                return "CLC";
-            }
-
-            // CLI
-            // 1001 0100 1111 1000
-            else if (currentInstruction == 0x94F8)
-            {
-                return "CLI";
-            }
-
-            // CLN
-            // 1001 0100 1010 1000
-            else if (currentInstruction == 0x94A8)
-            {
-                return "CLN";
-            }
-
-            // CLS
-            // 1001 0100 1100 1000
-            else if (currentInstruction == 0x94C8)
-            {
-                return "CLS";
-            }
-
-            // CLT
-            // 1001 0100 1110 1000
-            else if (currentInstruction == 0x94E8)
-            {
-                return "CLT";
-            }
-
-            // CLV
-            // 1001 0100 1011 1000
-            else if (currentInstruction == 0x94B8)
-            {
-                return "CLV";
-            }
-
-            // CLZ
-            // 1001 0100 1001 1000
-            else if (currentInstruction == 0x9498)
-            {
-                return "CLZ";
-            }
-
-            // COM
-            // 1001 010d dddd 0000
-            else if ((currentInstruction & 0xFE0F) == 0x9400)
-            {
-                return "COM";
-            }
-
-            // CP
-            // 0001 01rd dddd rrrr
-            else if ((currentInstruction & 0xFC00) == 0x1400)
-            {
-                return "CP";
-            }
-
-            // CPC
-            // 0000 01rd dddd rrrr
-            else if ((currentInstruction & 0xFC00) == 0x0400)
-            {
-                return "CPC " + GetRd(currentInstruction) + ", " + GetRr(currentInstruction);
-            }
-
-            // CPI
-            // 0011 KKKK dddd KKKK
-            else if ((currentInstruction & 0xF000) == 0x3000)
-            {
-                return "CPI " + GetRegisterName(((currentInstruction >> 4) & 0xF) + 0x10) + ", " + GetHexByte(((currentInstruction >> 4) & 0xF0) | (currentInstruction & 0xF));
-            }
-
-            // CPSE
-            // 0001 00rd dddd rrrr
-            else if ((currentInstruction & 0xFC00) == 0x1000)
-            {
-                return "CPSE";
-            }
-
-            // DEC
-            // 1001 010d dddd 1010
-            else if ((currentInstruction & 0xFE0F) == 0x940A)
-            {
-                return "DEC";
-            }
-
-            // DES
-            // 1001 0100 KKKK 1011
-            else if ((currentInstruction & 0xFF0F) == 0x940B)
-            {
-                return "DES";
-            }
-
-            // EICALL
-            // 1001 0101 0001 1001
-            else if (currentInstruction == 0x9519)
-            {
-                return "EICALL";
-            }
-
-            // EIJMP
-            // 1001 0100 0001 1001
-            else if (currentInstruction == 0x9419)
-            {
-                return "EIJMP";
-            }
-
-            // ELPM
-            // 1001 0101 1101 1000
-            else if (currentInstruction == 0x95D8)
-            {
-                return "ELPM";
-            }
-
-            // ELPM Z
-            // 1001 000d dddd 0110
-            else if ((currentInstruction & 0xFE0F) == 0x9006)
-            {
-                return "ELPM Z";
-            }
-
-            // ELPM Z+
-            // 1001 000d dddd 0111
-            else if ((currentInstruction & 0xFE0F) == 0x9007)
-            {
-                return "ELPM Z+";
-            }
-
-            // EOR
-            // 0010 01rd dddd rrrr
-            else if ((currentInstruction & 0xFC00) == 0x2400)
-            {
-                if (GetRd(currentInstruction).Equals(GetRr(currentInstruction)))
-                    return "CLR " + GetRd(currentInstruction);
-                return "EOR " + GetRd(currentInstruction) + ", " + GetRr(currentInstruction);
-            }
-
-            // FMUL
-            // 0000 0011 0ddd 1rrr
-            else if ((currentInstruction & 0xFF88) == 0x0308)
-            {
-                return "FMUL";
-            }
-
-            // FMULS
-            // 0000 0011 1ddd 0rrr
-            else if ((currentInstruction & 0xFF88) == 0x0380)
-            {
-                return "FMULS";
-            }
-
-            // FMULSU
-            // 0000 0011 1ddd 1rrr
-            else if ((currentInstruction & 0xFF88) == 0x0388)
-            {
-                return "FMULSU";
-            }
-
-            // ICALL
-            // 1001 0101 0000 1001
-            else if (currentInstruction == 0x9509)
-            {
-                return "ICALL";
-            }
-
-            // IJMP
-            // 1001 0100 0000 1001
-            else if (currentInstruction == 0x9409)
-            {
-                return "IJMP";
-            }
-
-            // IN
-            // 1011 0AAd dddd AAAA
-            else if ((currentInstruction & 0xF800) == 0xB000)
-            {
-                return "IN " + GetRd(currentInstruction) + ", " + GetRegisterName((((currentInstruction >> 5) & 0x30) | (currentInstruction & 0xF)) + 0x20);
-            }
-
-            // INC
-            // 1001 010d dddd 0011
-            else if ((currentInstruction & 0xFE0F) == 0x9403)
-            {
-                return "INC";
-            }
-
-            // JMP
-            // 1001 010k kkkk 110k
-            // kkkk kkkk kkkk kkkk
-            else if ((currentInstruction & 0xFE0E) == 0x940C)
-            {
-                return "JMP " + GetHex(nextInstruction);
-            }
-
-            // LAC
-            // 1001 001r rrrr 0110
-            else if ((currentInstruction & 0xFE0F) == 0x9206)
-            {
-                return "LAC";
-            }
-
-            // LAS
-            // 1001 001r rrrr 0101
-            else if ((currentInstruction & 0xFE0F) == 0x9205)
-            {
-                return "LAS";
-            }
-
-            // LAT
-            // 1001 001r rrrr 0111
-            else if ((currentInstruction & 0xFE0F) == 0x9207)
-            {
-                return "LAT";
-            }
-
-            // LD X
-            // 1001 000d dddd 1100
-            else if ((currentInstruction & 0xFE0F) == 0x900C)
-            {
-                return "LD X";
-            }
-
-            // LD X+
-            // 1001 000d dddd 1101
-            else if ((currentInstruction & 0xFE0F) == 0x900D)
-            {
-                return "LD X+";
-            }
-
-            // LD -X
-            // 1001 000d dddd 1110
-            else if ((currentInstruction & 0xFE0F) == 0x900E)
-            {
-                return "LD -X";
-            }
-
-            // LD Y
-            // 1000 000d dddd 1000
-            else if ((currentInstruction & 0xFE0F) == 0x8008)
-            {
-                return "LD Y";
-            }
-
-            // LD Y+
-            // 1001 000d dddd 1001
-            else if ((currentInstruction & 0xFE0F) == 0x9009)
-            {
-                return "LD Y+";
-            }
-
-            // LD -Y
-            // 1001 000d dddd 1010
-            else if ((currentInstruction & 0xFE0F) == 0x900A)
-            {
-                return "LD -Y";
-            }
-
-            // LD Y+q
-            // 10q0 qq0d dddd 1qqq
-            else if ((currentInstruction & 0xD208) == 0x8008)
-            {
-                return "LD Y+q";
-            }
-
-            // LD Z
-            // 1000 000d dddd 0000
-            else if ((currentInstruction & 0xFE0F) == 0x8000)
-            {
-                return "LD Z";
-            }
-
-            // LD Z+
-            // 1001 000d dddd 0001
-            else if ((currentInstruction & 0xFE0F) == 0x9001)
-            {
-                return "LD Z+";
-            }
-
-            // LD -Z
-            // 1001 000d dddd 0010
-            else if ((currentInstruction & 0xFE0F) == 0x9002)
-            {
-                return "LD -Z";
-            }
-
-            // LD Z+q
-            // 10q0 qq0d dddd 0qqq
-            else if ((currentInstruction & 0xD208) == 0x8000)
-            {
-                return "LD Z+q";
-            }
-
-            // LDI
-            // 1110 KKKK dddd KKKK
-            else if ((currentInstruction & 0xF000) == 0xE000)
-            {
-                return "LDI " + GetRegisterName(((currentInstruction >> 4) & 0xF) + 0x10) + ", " + GetHexByte((currentInstruction >> 4) & 0xF0 | (currentInstruction & 0xF));
-            }
-
-            // LDS
-            // 1001 000d dddd 0000
-            // kkkk kkkk kkkk kkkk
-            else if ((currentInstruction & 0xFE0F) == 0x9000)
-            {
-                return "LDS " + GetRd(currentInstruction) + ", " + GetHex(nextInstruction);
-            }
-
-            // LDS
-            // 1010 0kkk dddd kkkk
-            else if ((currentInstruction & 0xF800) == 0xA000)
-            {
-                return "LDS";
-            }
-
-            // LPM
-            // 1001 0101 1100 1000
-            else if (currentInstruction == 0x95C8)
-            {
-                return "LPM";
-            }
-
-            // LPM Z
-            // 1001 000d dddd 0100
-            else if ((currentInstruction & 0xFE0F) == 0x9004)
-            {
-                return "LPM Z";
-            }
-
-            // LPM Z+
-            // 1001 000d dddd 0101
-            else if ((currentInstruction & 0xFE0F) == 0x9005)
-            {
-                return "LPM Z+";
-            }
-
-            // LSL
-            // 0000 11dd dddd dddd
-            else if ((currentInstruction & 0xFC00) == 0x0C00)
-            {
-                return "LSL";
-            }
-
-            // LSR
-            // 1001 010d dddd 0110
-            else if ((currentInstruction & 0xFE0F) == 0x9406)
-            {
-                return "LSR";
-            }
-
-            // MOV
-            // 0010 11rd dddd rrrr
-            else if ((currentInstruction & 0xFC00) == 0x2C00)
-            {
-                return "MOV " + GetRd(currentInstruction) + ", " + GetRr(currentInstruction);
-            }
-
-            // MOVW
-            // 0000 0001 dddd rrrr
-            else if ((currentInstruction & 0xFF00) == 0x0100)
-            {
-                return "MOVW";
-            }
-
-            // MUL
-            // 1001 11rd dddd rrrr
-            else if ((currentInstruction & 0xFC00) == 0x9C00)
-            {
-                return "MUL";
-            }
-
-            // MULS
-            // 0000 0010 dddd rrrr
-            else if ((currentInstruction & 0xFF00) == 0x0200)
-            {
-                return "MULS";
-            }
-
-            // MULSU
-            // 0000 0011 0ddd 0rrr
-            else if ((currentInstruction & 0xFF88) == 0x0300)
-            {
-                return "MULSU";
-            }
-
-            // NEG
-            // 1001 010d dddd 0001
-            else if ((currentInstruction & 0xFE0F) == 0x9401)
-            {
-                return "NEG";
-            }
-
-            // NOP
-            // 0000 0000 0000 0000
-            else if (currentInstruction == 0x0000)
-            {
-                return "NOP";
-            }
-
-            // OR
-            // 0010 10rd dddd rrrr
-            else if ((currentInstruction & 0xFC00) == 0x2800)
-            {
-                return "OR";
-            }
-
-            // ORI
-            // 0110 KKKK dddd KKKK
-            else if ((currentInstruction & 0xF000) == 0x6000)
-            {
-                return "ORI " + GetRegisterName(((currentInstruction >> 4) & 0xF) + 0x10) + ", " + GetHexByte(((currentInstruction >> 4) & 0xF0) | (currentInstruction & 0xF));
-            }
-
-            // OUT
-            // 1011 1AAr rrrr AAAA
-            else if ((currentInstruction & 0xF800) == 0xB800)
-            {
-                return "OUT " + GetRegisterName((((currentInstruction >> 5) & 0x30) | (currentInstruction & 0xF)) + 0x20) + ", " + GetRd(currentInstruction);
-            }
-
-            // POP
-            // 1001 000d dddd 1111
-            else if ((currentInstruction & 0xFE0F) == 0x900F)
-            {
-                return "POP";
-            }
-
-            // PUSH
-            // 1001 001d dddd 1111
-            else if ((currentInstruction & 0xFE0F) == 0x920F)
-            {
-                return "PUSH";
-            }
-
-            // RCALL
-            // 1101 kkkk kkkk kkkk
-            else if ((currentInstruction & 0xF000) == 0xD000)
-            {
-                return "RCALL";
-            }
-
-            // RET
-            // 1001 0101 0000 1000
-            else if (currentInstruction == 0x9508)
-            {
-                return "RET";
-            }
-
-            // RETI
-            // 1001 0101 0001 1000
-            else if (currentInstruction == 0x9518)
-            {
-                return "RETI";
-            }
-
-            // RJMP
-            // 1100 kkkk kkkk kkkk
-            else if ((currentInstruction & 0xF000) == 0xC000)
-            {
-                int pos = ((currentInstruction << 20) >> 20) + 1;
-                if (pos < 0)
-                    return "RJMP -" + GetHexByte(pos * -1);
-                return "RJMP +" + GetHexByte(pos);
-            }
-
-            // ROL
-            // 0001 11dd dddd dddd
-            else if ((currentInstruction & 0xFC00) == 0x1C00)
-            {
-                return "ROL";
-            }
-
-            // ROR
-            // 1001 010d dddd 0111
-            else if ((currentInstruction & 0xFE0F) == 0x9407)
-            {
-                return "ROR";
-            }
-
-            // SBC
-            // 0000 10rd dddd rrrr
-            else if ((currentInstruction & 0xFC00) == 0x0800)
-            {
-                return "SBC";
-            }
-
-            // SBCI
-            // 0100 KKKK dddd KKKK
-            else if ((currentInstruction & 0xF000) == 0x0400)
-            {
-                return "SBCI";
-            }
-
-            // SBI
-            // 1001 1010 AAAA Abbb
-            else if ((currentInstruction & 0xFF00) == 0x9A00)
-            {
-                return "SBI";
-            }
-
-            // SBIC
-            // 1001 1001 AAAA Abbb
-            else if ((currentInstruction & 0xFF00) == 0x9900)
-            {
-                return "SBIC";
-            }
-
-            // SBIS
-            // 1001 1011 AAAA Abbb
-            else if ((currentInstruction & 0xFF00) == 0x9B00)
-            {
-                return "SBIS";
-            }
-
-            // SBIW
-            // 1001 0111 KKdd KKKK
-            else if ((currentInstruction & 0xFF00) == 0x9700)
-            {
-                int rd = (((currentInstruction >> 4) & 0x3) * 2) + 24;
-                return "SBIW " + GetRegisterName(rd + 1) + ":" + GetRegisterName(rd) + ", " + GetHex(((currentInstruction >> 2) & 0x30) | (currentInstruction & 0xF));
-            }
-
-            // SBR
-            // 0110 KKKK dddd KKKK
-            else if ((currentInstruction & 0xF000) == 0x6000)
-            {
-                return "SBR";
+                return "BST " + GetRd(currentInstruction) + ", " + (currentInstruction & 0x7);
             }
 
             // SBRC
             // 1111 110r rrrr 0bbb
             else if ((currentInstruction & 0xFE08) == 0xFC00)
             {
-                return "SBRC";
+                return "SBRC " + GetRd(currentInstruction) + ", " + (currentInstruction & 0x7);
             }
 
             // SBRS
             // 1111 111r rrrr 0bbb
             else if ((currentInstruction & 0xFE08) == 0xFE00)
             {
-                return "SBRS";
+                return "SBRS " + GetRd(currentInstruction) + ", " + (currentInstruction & 0x7);
             }
 
-            // SEC
-            // 1001 0100 0000 1000
-            else if (currentInstruction == 0x9408)
+            // BRBS
+            // 1111 00kk kkkk ksss
+            else if ((currentInstruction & 0xFC00) == 0xF000)
             {
-                return "SEC";
+                return "BRBS";
             }
 
-            // SEH
-            // 1001 0100 0101 1000
-            else if (currentInstruction == 0x9458)
+            // BRBC
+            // 1111 01kk kkkk ksss
+            else if ((currentInstruction & 0xFC00) == 0xF400)
             {
-                return "SEH";
+                return "BRBC";
             }
+            #endregion
 
-            // SEN
-            // 1001 0100 0010 1000
-            else if (currentInstruction == 0x9428)
+            #region 10q0
+            // LDD Y+q
+            // 10q0 qq0d dddd 1qqq
+            else if ((currentInstruction & 0xD208) == 0x8008)
             {
-                return "SEN";
+                return "LDD " + GetRd(currentInstruction) + ", Y+" + (((currentInstruction & 0x2000) >> 8) | ((currentInstruction & 0xC00) >> 7) | (currentInstruction & 0x7));
             }
 
-            // SER
-            // 1110 1111 dddd 1111
-            else if ((currentInstruction & 0xFF0F) == 0xEF0F)
+            // LDD Z+q
+            // 10q0 qq0d dddd 0qqq
+            else if ((currentInstruction & 0xD208) == 0x8000)
             {
-                return "SER";
+                return "LDD " + GetRd(currentInstruction) + ", Z+" + (((currentInstruction & 0x2000) >> 8) | ((currentInstruction & 0xC00) >> 7) | (currentInstruction & 0x7));
             }
 
-            // SES
-            // 1001 0100 0100 1000
-            else if (currentInstruction == 0x9448)
-            {
-                return "SES";
-            }
-
-            // SET
-            // 1001 0100 0110 1000
-            else if (currentInstruction == 0x9468)
-            {
-                return "SET";
-            }
-
-            // SEV
-            // 1001 0100 0011 1000
-            else if (currentInstruction == 0x9438)
-            {
-                return "SEV";
-            }
-
-            // SEZ
-            // 1001 0100 0001 1000
-            else if (currentInstruction == 0x9418)
-            {
-                return "SEZ";
-            }
-
-            // SLEEP
-            // 1001 0101 1000 1000
-            else if (currentInstruction == 0x9588)
-            {
-                return "SLEEP";
-            }
-
-            // SPM
-            // 1001 0101 1110 1000
-            else if (currentInstruction == 0x95E8)
-            {
-                return "SPM";
-            }
-
-            // SPM
-            // 1001 0101 1110 1000
-            else if (currentInstruction == 0x95F8)
-            {
-                return "SPM";
-            }
-
-            // ST X
-            // 1001 001r rrrr 1100
-            else if ((currentInstruction & 0xFE0F) == 0x920C)
-            {
-                return "ST X";
-            }
-
-            // ST X+
-            // 1001 001r rrrr 1101
-            else if ((currentInstruction & 0xFE0F) == 0x920D)
-            {
-                return "ST X+, " + GetRegisterName((currentInstruction >> 4) & 0x1F);
-            }
-
-            // ST -X
-            // 1001 001r rrrr 1110
-            else if ((currentInstruction & 0xFE0F) == 0x920E)
-            {
-                return "ST -X";
-            }
-
-            // ST Y
-            // 1000 001r rrrr 1000
-            else if ((currentInstruction & 0xFE0F) == 0x8208)
-            {
-                return "ST Y";
-            }
-
-            // ST Y+
-            // 1001 001r rrrr 1001
-            else if ((currentInstruction & 0xFE0F) == 0x9209)
-            {
-                return "ST Y+";
-            }
-
-            // ST -Y
-            // 1001 001r rrrr 1010
-            else if ((currentInstruction & 0xFE0F) == 0x920A)
-            {
-                return "ST -Y";
-            }
-
-            // ST Y+q
+            // STD Y+q
             // 10q0 qq1r rrrr 1qqq
             else if ((currentInstruction & 0xD208) == 0x8208)
             {
-                return "ST Y+q";
+                return "STD Y+" + (((currentInstruction & 0x2000) >> 8) | ((currentInstruction & 0xC00) >> 7) | (currentInstruction & 0x7)) + ", " + GetRd(currentInstruction);
             }
 
-            // ST Z
-            // 1000 001r rrrr 0000
-            else if ((currentInstruction & 0xFE0F) == 0x8200)
-            {
-                return "ST Z";
-            }
-
-            // ST Z+
-            // 1001 001r rrrr 0001
-            else if ((currentInstruction & 0xFE0F) == 0x9201)
-            {
-                return "ST Z+";
-            }
-
-            // ST -Y
-            // 1001 001r rrrr 0010
-            else if ((currentInstruction & 0xFE0F) == 0x9202)
-            {
-                return "ST -Y";
-            }
-
-            // ST Y+q
-            // 10q0 qq1r rrrr 1qqq
+            // ST Z+q
+            // 10q0 qq1r rrrr 0qqq
             else if ((currentInstruction & 0xD208) == 0x8200)
             {
                 return "ST Y+q";
             }
+            #endregion
 
-            // STS
-            // 1001 001d dddd 0000
-            // kkkk kkkk kkkk kkkk
-            else if ((currentInstruction & 0xFE0F) == 0x9200)
-            {
-                return "STS " + GetHex(nextInstruction) + ", " + GetRd(currentInstruction);
-            }
-
-            // STS
-            // 1010 1kkk dddd kkkk
-            else if ((currentInstruction & 0xF800) == 0xA800)
-            {
-                return "STS";
-            }
-
-            // SUB
-            // 0001 10rd dddd rrrr
-            else if ((currentInstruction & 0xFC00) == 0x1800)
-            {
-                return "SUB";
-            }
-
-            // SUBI
-            // 0101 KKKK dddd KKKK
-            else if ((currentInstruction & 0xF000) == 0x5000)
-            {
-                return "SUBI " + GetRegisterName(((currentInstruction >> 4) & 0xF) + 0x10) + ", " + GetHexByte(((currentInstruction >> 4) & 0xF0) | (currentInstruction & 0xF));
-            }
-
-            // SWAP
-            // 1001 010d dddd 0010
-            else if ((currentInstruction & 0xFE0F) == 0x9402)
-            {
-                return "SWAP";
-            }
-
-            // TST
-            // 1001 010d dddd 0010
-            else if ((currentInstruction & 0xFC00) == 0x2000)
-            {
-                return "TST";
-            }
-
-            // WDR
-            // 1001 0101 1010 1000
-            else if (currentInstruction == 0x95A8)
-            {
-                return "WDR";
-            }
-
-            // XCH
-            // 1001 0101 1010 1000
-            else if ((currentInstruction & 0xFE0F) == 0x9204)
-            {
-                return "";
-            }
-            return "XCH";
+            return "UNKNOWN " + GetHex(currentInstruction);
         }
 
         public static string GetRegisterName(int register)

@@ -29,8 +29,9 @@ namespace AVRSim
 {
     public partial class frmMain : Form
     {
-        public static int flashSize = 0x8000;
-        public static int sramSize = 2048;
+        public static Device currentDevice;
+
+        List<Device> devices = new List<Device>();
 
         bool isProgramLoaded = false;
         bool isStarted = false;
@@ -43,7 +44,35 @@ namespace AVRSim
         public frmMain()
         {
             InitializeComponent();
+            InitializeDevices();
             FormClosed += FrmMain_FormClosed;
+        }
+
+        void InitializeDevices() {
+            devices.Add(new Device()
+            {
+                SRamSize = 2048,
+                FlashSize = 0x8000,
+                EEPROMSize = 1024,
+                GPRStart = 0,
+                IORStart = 32,
+                Speed = 16,
+                Name = "Arduino Nano (ATmega328P)"
+            }); 
+            devices.Add(new Device()
+            {
+                SRamSize = 1024,
+                FlashSize = 0x4000,
+                EEPROMSize = 512,
+                GPRStart = 0,
+                IORStart = 32,
+                Speed = 16,
+                Name = "Arduino Nano (ATmega168)"
+            });
+            currentDevice = devices[0];
+
+            cmbDevice.Items.AddRange(devices.ToArray());
+            cmbDevice.SelectedIndex = 0;
         }
 
         private void FrmMain_FormClosed(object sender, FormClosedEventArgs e)
@@ -53,19 +82,28 @@ namespace AVRSim
 
         private void btnLoadPrg_Click(object sender, EventArgs e)
         {
+            LoadProgram();
+        }
+
+        void LoadProgram() {
             if (dlgOpen.ShowDialog() == DialogResult.OK)
             {
                 List<byte> flashBytes = HexDecoder.Decode(dlgOpen.FileName); //Application.StartupPath + "\\sketch\\sketch.ino.eightanaloginputs.hex"
                 SetStatusText(flashBytes.Count);
-                AVR.SRAM = new byte[2048];
+                AVR.SRAM = new byte[currentDevice.SRamSize + 0x100];
                 avr = new AVR()
                 {
-                    FLASH = new AVR.Flash(32 * 1024, flashBytes),
-                    GPR = new AVR.Registers(0),
-                    IOR = new AVR.Registers(32)
+                    FLASH = new AVR.Flash(currentDevice.FlashSize, flashBytes),
+                    GPR = new AVR.Registers(currentDevice.GPRStart),
+                    IOR = new AVR.Registers(currentDevice.IORStart)
                 };
                 isProgramLoaded = true;
                 grp1.Enabled = true;
+                RefreshTextboxes();
+                btnStep.Enabled = true;
+                btnRun.Enabled = true;
+                btnStop.Enabled = true;
+                isStarted = true;
             }
         }
 
@@ -78,10 +116,35 @@ namespace AVRSim
 
         private void fCpuThread()
         {
+            int i = 0;
             while (!avr.isHalted)
             {
                 avr.Step();
-                Thread.Sleep(sleepMs);
+                i++;
+                if (i == 1550 && ((AVR.SRAM[0x6E] & 1) == 1))
+                {
+                    AVR.SRAM[0x35] |= 1; // Set TIFR0's 0bit
+                    i = 0;
+                }
+            }
+            
+        }
+
+        private void fCpuThreadSlow()
+        {
+            DateTime start = DateTime.Now;
+            int i = 0;
+            while (!avr.isHalted)
+            {
+                avr.Step();
+                i++;
+                while ((DateTime.Now - start).Ticks < sleepMs) { }
+                start = DateTime.Now;
+                if (i == 1550 && ((AVR.SRAM[0x6E] & 1) == 1))
+                {
+                    AVR.SRAM[0x35] |= 1; // Set TIFR0's 0bit
+                    i = 0;
+                }
             }
         }
 
@@ -122,9 +185,16 @@ namespace AVRSim
 
         private void btnRun_Click(object sender, EventArgs e)
         {
+            Start();   
+        }
+
+        void Start() {
             if (cpuThread == null)
             {
-                cpuThread = new Thread(new ThreadStart(fCpuThread));
+                if (sleepMs != 0)
+                    cpuThread = new Thread(new ThreadStart(fCpuThreadSlow));
+                else
+                    cpuThread = new Thread(new ThreadStart(fCpuThread));
                 cpuThread.Start();
                 tmrRefresh.Enabled = true;
             }
@@ -144,51 +214,32 @@ namespace AVRSim
             cmbSpeed.Items.Add("General");
             cmbSpeed.Items.Add("Fast");
             cmbSpeed.Items.Add("Extreamly fast");
-            cmbSpeed.SelectedIndex = 4;
+            cmbSpeed.Items.Add("Realtime");
+            cmbSpeed.SelectedIndex = 5;
         }
 
         private void cmbSpeed_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (cmbSpeed.SelectedIndex == 0)
-                sleepMs = 1000;
+                sleepMs = 5000000;
             else if (cmbSpeed.SelectedIndex == 1)
-                sleepMs = 500;
+                sleepMs = 1000000;
             else if(cmbSpeed.SelectedIndex == 2)
-                sleepMs = 100;
+                sleepMs = 100000;
             else if(cmbSpeed.SelectedIndex == 3)
-                sleepMs = 10;
+                sleepMs = 50000;
+            else if (cmbSpeed.SelectedIndex == 4)
+                sleepMs = 1;
             else
                 sleepMs = 0;
         }
 
-        private void btnBegin_Click(object sender, EventArgs e)
-        {
-            if (isProgramLoaded && avr != null)
-            {
-                RefreshTextboxes();
-                btnStep.Enabled = true;
-                btnRun.Enabled = true;
-                btnPause.Enabled = true;
-                btnStop.Enabled = true;
-                btnBegin.Enabled = false;
-                isStarted = true;
-            }
-            else
-                MessageBox.Show("Please load a program first!", "No program", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-        }
-
-        private void btnReset_Click(object sender, EventArgs e)
-        {
-            if (isProgramLoaded)
-            {
-                //TODO
-            }
-            else 
-                MessageBox.Show("Please load a program first!", "No program", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-        }
-
         private void btnClear_Click(object sender, EventArgs e)
         {
+            ClearAll();
+        }
+
+        void ClearAll() {
             if (isProgramLoaded)
             {
                 avr.isHalted = true;
@@ -202,6 +253,7 @@ namespace AVRSim
                 txtNextInst.Text = "";
                 txtWords.Text = "";
                 txtSreg.Text = "";
+                grp1.Enabled = false;
                 ChangeLabelState(sregI, false);
                 ChangeLabelState(sregT, false);
                 ChangeLabelState(sregH, false);
@@ -217,13 +269,12 @@ namespace AVRSim
             }
             else
                 MessageBox.Show("Please load a program first!", "No program", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-
         }
 
         private void btnSettings_Click(object sender, EventArgs e)
         {
             if (!isProgramLoaded && !isStarted) {
-                frmSettings settings = new frmSettings(flashSize, sramSize);
+                frmSettings settings = new frmSettings(currentDevice.FlashSize, currentDevice.SRamSize);
                 settings.ShowDialog();
             } else
                 MessageBox.Show("Can't change settings now!\nClear all and try again.", "Program loaded", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
@@ -233,6 +284,132 @@ namespace AVRSim
         {
             frmRegisters registers = new frmRegisters();
             registers.Show();
+        }
+
+        private void btnVariables_Click(object sender, EventArgs e)
+        {
+            frmVariables variables = new frmVariables();
+            variables.Show();
+        }
+
+        private void btnPins_Click(object sender, EventArgs e)
+        {
+            frmMcView mcView = new frmMcView();
+            mcView.Show();
+        }
+
+        private void cmbDevice_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            currentDevice = devices[cmbDevice.SelectedIndex];
+            RefreshDeviceDetails();
+        }
+
+        void RefreshDeviceDetails() {
+            if (currentDevice.SRamSize >= 1024)
+                lblSram.Text = Math.Round(currentDevice.SRamSize / 1024f, 2) + " KB";
+            else
+                lblSram.Text = currentDevice.SRamSize + " bytes";
+
+            if (currentDevice.FlashSize >= 1024)
+                lblFlash.Text = Math.Round(currentDevice.FlashSize / 1024f, 2) + " KB (Usable " + Math.Round((currentDevice.FlashSize-2048) / 1024f, 2) + " KB)";
+            else
+                lblFlash.Text = currentDevice.FlashSize + " bytes";
+
+            if (currentDevice.EEPROMSize >= 1024)
+                lblEEPROM.Text = Math.Round(currentDevice.EEPROMSize / 1024f, 2) + " KB";
+            else
+                lblEEPROM.Text = currentDevice.EEPROMSize + " bytes";
+
+            lblClock.Text = currentDevice.Speed + " MHz";
+        }
+
+        private void beginToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Start();
+        }
+
+        private void stepToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            avr.Step();
+            RefreshTextboxes();
+        }
+
+        private void btnStop_Click(object sender, EventArgs e)
+        {
+            avr.isHalted = true;
+        }
+
+        private void stopToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            avr.isHalted = true;
+        }
+
+        private void loadProgramToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            LoadProgram();
+        }
+
+        private void clearAllToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            ClearAll();
+        }
+
+        private void extreamlySlowToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            cmbSpeed.SelectedIndex = 0;
+        }
+
+        private void slowToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            cmbSpeed.SelectedIndex = 1;
+        }
+
+        private void generalToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            cmbSpeed.SelectedIndex = 2;
+        }
+
+        private void fastToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            cmbSpeed.SelectedIndex = 3;
+        }
+
+        private void extreamlyFastToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            cmbSpeed.SelectedIndex = 4;
+        }
+
+        private void realtimeToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            cmbSpeed.SelectedIndex = 5;
+        }
+
+        private void registersToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            frmRegisters registers = new frmRegisters();
+            registers.Show();
+        }
+
+        private void variablesToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            frmVariables variables = new frmVariables();
+            variables.Show();
+        }
+
+        private void microcontrollerViewToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            frmMcView McView = new frmMcView();
+            McView.Show();
+        }
+
+        private void arduinoNanoATmega328PToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            cmbDevice.SelectedIndex = 0;
+        }
+
+        private void arduinoNanoATmega168ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            cmbDevice.SelectedIndex = 1;
         }
     }
 }

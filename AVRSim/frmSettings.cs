@@ -1,4 +1,24 @@
-﻿using System;
+﻿//---------------------------------------------------------------------------
+//  Version 1.0.0
+//  Copyright (C) 2020 Yohan Sandun (yohan99ysk@gmail.com)
+//
+//  This file is part of AVRSim.
+//
+//  AVRSim is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  AVRSim is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with AVRSim.  If not, see <https://www.gnu.org/licenses/>.
+//
+//---------------------------------------------------------------------------
+using System;
 using System.Windows.Forms;
 
 namespace AVRSim
@@ -37,8 +57,7 @@ namespace AVRSim
         private void btnOk_Click(object sender, EventArgs e)
         {
             if (ValidateFields()) {
-                frmMain.sramSize = int.Parse(txtSram.Text.Trim());
-                frmMain.flashSize = int.Parse(txtFlash.Text.Trim());
+                //TODO
                 this.DialogResult = DialogResult.OK;
                 Close();
             }
@@ -52,7 +71,7 @@ namespace AVRSim
         private void btnDef_Click(object sender, EventArgs e)
         {
             txtFlash.Text = "32768";
-            txtSram.Text = "2048";
+            txtSram.Text = "1024";
         }
     }
 }
